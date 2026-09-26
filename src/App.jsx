@@ -4,12 +4,16 @@ import ModelSelector from "./components/ModelSelector";
 import QuickActions from "./components/QuickActions";
 import PromptInput from "./components/PromptInput";
 import NavRail from "./components/NavRail";
+import HistoryPage from "./components/HistoryPage";
+import SettingsPage from "./components/SettingsPage";
 import { models } from "./data/models";
 
 function App() {
   const [selectedModel, setSelectedModel] = useState(models[0]);
+  const [defaultModel, setDefaultModel] = useState(models[0]);
   const [prompt, setPrompt] = useState("");
   const [activePage, setActivePage] = useState("chat");
+  const [theme, setTheme] = useState("dark");
 
   const handleQuickAction = (label) => {
     setPrompt(`${label}: `);
@@ -21,7 +25,7 @@ function App() {
   };
 
   return (
-    <div className="bg-base text-text-primary h-full w-full flex">
+    <div data-theme={theme} className="bg-base text-text-primary h-full w-full flex">
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0">
         <div className="flex items-center gap-2 p-4 border-b border-border-subtle">
@@ -50,16 +54,15 @@ function App() {
           </>
         )}
 
-        {activePage === "history" && (
-          <div className="flex-1 flex items-center justify-center p-4">
-            <p className="text-text-secondary text-sm">History page — coming in Step 7</p>
-          </div>
-        )}
+        {activePage === "history" && <HistoryPage />}
 
         {activePage === "settings" && (
-          <div className="flex-1 flex items-center justify-center p-4">
-            <p className="text-text-secondary text-sm">Settings page — coming in Step 8</p>
-          </div>
+          <SettingsPage
+            defaultModel={defaultModel}
+            onDefaultModelChange={setDefaultModel}
+            theme={theme}
+            onThemeChange={setTheme}
+          />
         )}
       </div>
 
