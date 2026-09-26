@@ -8,43 +8,108 @@ import NavRail from "./components/NavRail";
 import HistoryPage from "./components/HistoryPage";
 import SettingsPage from "./components/SettingsPage";
 import ChatMessage from "./components/ChatMessage";
+import TypingIndicator from "./components/TypingIndicator";
 import { models } from "./data/models";
 import { getMockResponse } from "./data/mockResponses";
+import { generateTitle } from "./utils/generateTitle";
 import { useChromeStorage } from "./hooks/useChromeStorage";
 
 function App() {
-  const [prompt, setPrompt] = useState("");
-  const [activePage, setActivePage] = useState("chat");
   const [theme, setTheme] = useChromeStorage("echogpt-theme", "dark");
   const [defaultModel, setDefaultModel] = useChromeStorage("echogpt-defaultModel", models[0]);
-  const [messages, setMessages] = useChromeStorage("echogpt-messages", []);
+  const [conversations, setConversations] = useChromeStorage("echogpt-conversations", []);
+  const [activeConversationId, setActiveConversationId] = useChromeStorage("echogpt-activeId", null);
+
   const [selectedModel, setSelectedModel] = useState(defaultModel);
+  const [prompt, setPrompt] = useState("");
+  const [activePage, setActivePage] = useState("chat");
+  const [isTyping, setIsTyping] = useState(false);
+
+  const activeConversation = conversations.find((c) => c.id === activeConversationId) || null;
+  const messages = activeConversation ? activeConversation.messages : [];
 
   const handleQuickAction = (label) => {
     setPrompt(`${label}: `);
   };
 
-  const handleSend = () => {
-    if (!prompt.trim()) return;
-    const userMessage = { id: Date.now(), role: "user", content: prompt };
-    setMessages((prev) => [...prev, userMessage]);
-    setPrompt("");
-
+  const appendAiReply = (conversationId) => {
+    setIsTyping(true);
     setTimeout(() => {
       const aiMessage = { id: Date.now() + 1, role: "ai", content: getMockResponse() };
-      setMessages((prev) => [...prev, aiMessage]);
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === conversationId ? { ...c, messages: [...c.messages, aiMessage] } : c
+        )
+      );
+      setIsTyping(false);
     }, 500);
   };
 
-  const handleRegenerate = (id) => {
-    setMessages((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, content: getMockResponse() } : m))
+  const handleSend = () => {
+    if (!prompt.trim()) return;
+    const userMessage = { id: Date.now(), role: "user", content: prompt };
+
+    if (!activeConversationId) {
+      const newId = Date.now();
+      const newConversation = {
+        id: newId,
+        title: generateTitle(prompt),
+        modelName: selectedModel.name,
+        timestamp: Date.now(),
+        messages: [userMessage],
+      };
+      setConversations((prev) => [newConversation, ...prev]);
+      setActiveConversationId(newId);
+      appendAiReply(newId);
+    } else {
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === activeConversationId
+            ? { ...c, messages: [...c.messages, userMessage], timestamp: Date.now() }
+            : c
+        )
+      );
+      appendAiReply(activeConversationId);
+    }
+
+    setPrompt("");
+  };
+
+  const handleRegenerate = (messageId) => {
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.id === activeConversationId
+          ? {
+              ...c,
+              messages: c.messages.map((m) =>
+                m.id === messageId ? { ...m, content: getMockResponse() } : m
+              ),
+            }
+          : c
+      )
     );
   };
 
   const handleNewChat = () => {
-    setMessages([]);
+    setActiveConversationId(null);
     setPrompt("");
+  };
+
+  const handleSelectConversation = (id) => {
+    const convo = conversations.find((c) => c.id === id);
+    if (convo) {
+      const matchedModel = models.find((m) => m.name === convo.modelName);
+      if (matchedModel) setSelectedModel(matchedModel);
+    }
+    setActiveConversationId(id);
+    setActivePage("chat");
+  };
+
+  const handleDeleteConversation = (id) => {
+    setConversations((prev) => prev.filter((c) => c.id !== id));
+    if (id === activeConversationId) {
+      setActiveConversationId(null);
+    }
   };
 
   return (
@@ -60,9 +125,10 @@ function App() {
           {activePage === "chat" && messages.length > 0 && (
             <button
               onClick={handleNewChat}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface border border-border-subtle text-xs text-text-secondary hover:text-text-primary hover:border-white/20 transition-colors shrink-0"
+              aria-label="Start new chat"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface border border-border-subtle text-xs text-text-secondary hover:text-text-primary hover:border-white/20 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               New
             </button>
           )}
@@ -91,6 +157,7 @@ function App() {
                     onRegenerate={() => handleRegenerate(m.id)}
                   />
                 ))}
+                {isTyping && <TypingIndicator />}
               </div>
             )}
 
@@ -100,7 +167,13 @@ function App() {
           </>
         )}
 
-        {activePage === "history" && <HistoryPage />}
+        {activePage === "history" && (
+          <HistoryPage
+            conversations={conversations}
+            onSelect={handleSelectConversation}
+            onDelete={handleDeleteConversation}
+          />
+        )}
 
         {activePage === "settings" && (
           <SettingsPage

@@ -17,7 +17,9 @@ function PromptInput({ value, onChange, onSend }) {
         isFocused ? "border-brand-purple/60" : "border-border-subtle"
       }`}
     >
+      <label htmlFor="prompt-input" className="sr-only">Message EchoGPT</label>
       <textarea
+        id="prompt-input"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -30,9 +32,10 @@ function PromptInput({ value, onChange, onSend }) {
       <button
         onClick={onSend}
         disabled={!value.trim()}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-gradient disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+        aria-label="Send message"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-gradient disabled:opacity-30 disabled:cursor-not-allowed transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple"
       >
-        <ArrowUp className="h-4 w-4 text-white" />
+        <ArrowUp className="h-4 w-4 text-white" aria-hidden="true" />
       </button>
     </div>
   );
