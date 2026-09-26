@@ -38,8 +38,9 @@ body {
   font-family: "Inter", system-ui, sans-serif;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
-/* html, body, #root {
+
+html, body, #root {
   width: 380px;
   height: 600px;
   overflow: hidden;
-} */
+}
