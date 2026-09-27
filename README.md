@@ -3,7 +3,7 @@
 A redesigned, reimagined concept for the EchoGPT Chrome Extension — a compact, dark-first popup that lets users chat with multiple AI models, use quick actions, revisit past conversations, and customize their experience, all built with React, Tailwind CSS, and Chrome's Manifest V3.
 
 This project is a **frontend UI/UX redesign assignment**. It focuses on interface design, interaction patterns, component architecture, and Chrome extension packaging — not on live AI integration or backend services.
-
+**Live link** -https://echo-chrome-extention.vercel.app/
 ---
 
 ## Project Overview
