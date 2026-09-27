@@ -39,11 +39,11 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* html, body, #root {
+html, body, #root {
   width: 380px;
   height: 600px;
   overflow: hidden;
-} */
+}
 @media (min-width: 500px) {
   body {
     display: flex;
