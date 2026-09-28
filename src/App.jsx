@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Globe } from "lucide-react";
 import Logo from "./components/Logo";
 import ModelSelector from "./components/ModelSelector";
 import QuickActions from "./components/QuickActions";
@@ -11,6 +11,7 @@ import ChatMessage from "./components/ChatMessage";
 import TypingIndicator from "./components/TypingIndicator";
 import { models } from "./data/models";
 import { getMockResponse } from "./data/mockResponses";
+import { WEB_APP_URL } from "./data/links";
 import { generateTitle } from "./utils/generateTitle";
 import { useChromeStorage } from "./hooks/useChromeStorage";
 
@@ -122,16 +123,29 @@ function App() {
               EchoGPT
             </h1>
           </div>
-          {activePage === "chat" && messages.length > 0 && (
-            <button
-              onClick={handleNewChat}
-              aria-label="Start new chat"
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface border border-border-subtle text-xs text-text-secondary hover:text-text-primary hover:border-white/20 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple"
+
+          <div className="flex items-center gap-2 shrink-0">
+            {activePage === "chat" && messages.length > 0 && (
+              <button
+                onClick={handleNewChat}
+                aria-label="Start new chat"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface border border-border-subtle text-xs text-text-secondary hover:text-text-primary hover:border-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple"
+              >
+                <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+                New
+              </button>
+            )}
+            
+             < a href={WEB_APP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open EchoGPT website (opens in a new tab)"
+              title="Open EchoGPT website"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface border border-border-subtle text-text-secondary hover:text-text-primary hover:border-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple"
             >
-              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-              New
-            </button>
-          )}
+              <Globe className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
         </div>
 
         {activePage === "chat" && (
