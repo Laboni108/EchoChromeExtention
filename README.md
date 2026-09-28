@@ -3,7 +3,7 @@
 A redesigned, reimagined concept for the EchoGPT Chrome Extension — a compact, dark-first popup that lets users chat with multiple AI models, use quick actions, revisit past conversations, and customize their experience, all built with React, Tailwind CSS, and Chrome's Manifest V3.
 
 This project is a **frontend UI/UX redesign assignment**. It focuses on interface design, interaction patterns, component architecture, and Chrome extension packaging — not on live AI integration or backend services.
-
+**Live link** -https://echo-chrome-extention.vercel.app/
 ---
 
 ## Project Overview
@@ -82,9 +82,8 @@ No backend, authentication provider, or real AI API is used — see Assumptions 
 
 ## Additional Features Implemented
 
-Beyond the core assignment checklist, the following were added to improve usability and demonstrate more complete product thinking:
+Beyond the core assignment checklist, the following were added to improve usability and demonstrate more complete product thinking. These are additions not found in the original EchoGPT Chrome Web Store extension that this project reimagines:
 
-- **Persistent state via `chrome.storage`** — theme, default model, and full conversation history survive closing and reopening the popup (popups are destroyed/recreated by Chrome on every open, so this required deliberate persistence work, not just React state).
 - **Auto-generated conversation titles** — the first message of a new chat is used to generate a readable title, rather than requiring the user to name conversations manually.
 - **Relative timestamps** — conversations display human-friendly times ("Just now," "2h ago," "Yesterday") that update based on when the conversation was last active.
 - **Live conversation search** — the History page filters conversations in real time as you type.
@@ -92,8 +91,23 @@ Beyond the core assignment checklist, the following were added to improve usabil
 - **Typing indicator** — an animated three-dot indicator appears while the (mocked) AI response is being generated, rather than a silent delay.
 - **Full keyboard accessibility** — every interactive element (nav rail, model selector, quick actions, prompt input, history rows, settings controls) is reachable and operable via keyboard alone, with visible focus rings and `aria-label`s on all icon-only buttons.
 - **Reduced-motion support** — respects the OS-level "reduce motion" accessibility setting, minimizing transitions and animations for users who have that preference enabled.
-- **Dark/light theme system** — built on CSS custom properties (`@theme` tokens), allowing the entire interface to switch instantly while keeping brand accent colors (purple/pink/orange/cyan/lime) consistent across both themes.
-- **Empty states throughout** — friendly, on-brand empty states for both the Chat screen (quick actions) and History screen (no conversations yet / no search matches), rather than blank space.
+
+---
+
+## Keyboard Navigation
+
+The entire popup is fully operable without a mouse, meeting accessibility best practices for interactive UI:
+
+| Key | Action |
+|---|---|
+| `Tab` / `Shift+Tab` | Move focus forward/backward through all interactive elements (nav icons, model selector, quick actions, prompt input, history items, settings controls) |
+| `Enter` (on a focused button/history item) | Activate the focused element — open a conversation, click a nav tab, toggle a setting |
+| `Space` (on a focused history item) | Also opens the conversation (same as `Enter`) |
+| `Enter` (inside the prompt textarea) | Send the message |
+| `Shift+Enter` (inside the prompt textarea) | Insert a new line without sending |
+| `Ctrl+Shift+E` (Windows/Linux) / `Cmd+Shift+E` (Mac) | Open the EchoGPT popup from anywhere in the browser (configurable at `chrome://extensions/shortcuts` if already taken by another extension) |
+
+Every focused element displays a visible purple focus ring (`focus-visible`), so keyboard users can always tell where they are. Icon-only buttons (Copy, Regenerate, Delete, nav items) all include `aria-label`s for screen reader support, and the interface respects the OS-level "reduce motion" setting.
 
 ---
 
